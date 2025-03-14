@@ -130,3 +130,25 @@ services:
     depends_on:
       - pictrs
 {% endif %}
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    ports:
+      - 9187:9187
+    environment:
+      DATA_SOURCE_NAME: "postgresql://lemmy:{{ postgres_password }}@postgres:5432/lemmy?sslmode=disable"
+    links:
+      - prometheus
+      - postgres
